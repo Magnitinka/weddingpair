@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>График отношений – мужчина и женщина</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 16px 12px 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            font-size: 20px;
+            line-height: 1.3;
+            color: #1c1c1e;
+        }
+        h1 {
+            font-size: 32px;
+            line-height: 1.2;
+            margin: 0 0 0.2em 0;
+            font-weight: 700;
+            text-align: center;
+            color: #1c1c1e;
+        }
+        .sub {
+            text-align: center;
+            font-size: 17px;
+            color: #555;
+            margin-bottom: 1.2em;
+        }
+        .card {
+            background: #faf7f0;
+            border-radius: 16px;
+            padding: 16px 14px;
+            margin-bottom: 16px;
+            border: 1px solid #d9d0c0;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1c1c1e;
+            font-size: 18px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 20px;
+            background: #ffffff;
+            border: 2px solid #d9d0c0;
+            border-radius: 12px;
+            color: #1c1c1e;
+            -webkit-appearance: none;
+            appearance: none;
+            margin-bottom: 12px;
+        }
+        input:focus {
+            border-color: #b8a88a;
+            outline: none;
+        }
+        button {
+            background: #d9d0c0;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1c1c1e;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+            transition: 0.15s;
+            -webkit-appearance: none;
+        }
+        button:active {
+            transform: scale(0.97);
+            background: #c8bdaa;
+        }
+        .btn-pdf {
+            background: #2c3e50;
+            color: #fff;
+        }
+        .btn-pdf:active {
+            background: #1a252f;
+        }
+        .result {
+            margin-top: 16px;
+        }
+        .result-card {
+            background: #faf7f0;
+            border-radius: 16px;
+            padding: 14px 12px;
+            margin-bottom: 16px;
+            border: 1px solid #d9d0c0;
+            overflow-x: auto;
+        }
+        .result-card h3 {
+            font-size: 24px;
+            margin-bottom: 6px;
+            color: #1c1c1e;
+        }
+        .result-card p {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 4px;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 8px 0 4px 0;
+            font-size: 17px;
+        }
+        .stats span {
+            background: #f2e8d8;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 14px;
+            margin: 4px 0 8px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color.man { background: #2c3e50; }
+        .legend-color.woman { background: #e74c3c; }
+        /* Размеры как в калькуляторе 1 */
+        .interpretation {
+            font-size: 15px;
+            line-height: 1.4;
+            margin-top: 6px;
+        }
+        .interpretation .good { color: #155724; font-weight: 600; }
+        .interpretation .bad { color: #721c24; font-weight: 600; }
+        .interpretation .zero { color: #c0392b; font-weight: 700; background: #f8d7da; padding: 0 6px; border-radius: 4px; }
+        .interpretation .col-desc {
+            font-size: 14px;
+            color: #555;
+            margin-top: 6px;
+        }
+        .interpretation .col-desc li {
+            margin-bottom: 2px;
+            list-style-type: none;
+            padding: 2px 0;
+        }
+        .interpretation .col-desc ul {
+            padding-left: 12px;
+        }
+        .interpretation .man-label { color: #2c3e50; font-weight: 700; }
+        .interpretation .woman-label { color: #e74c3c; font-weight: 700; }
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #c0392b;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin: 4px 0;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .copyright {
+            margin-top: 2em;
+            padding-top: 1em;
+            border-top: 2px solid #d9d0c0;
+            font-size: 5px;
+            line-height: 1.2;
+            color: #888888;
+        }
+        .copyright a {
+            color: #888888;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+        .no-print { display: block; }
+        .print-only { display: none; }
+        hr { border: none; border-top: 1px solid #d9d0c0; margin: 8px 0; }
+        @media print {
+            body { max-width: 100%; padding: 0.2in; font-size: 16px; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            canvas { max-width: 100%; }
+            .result-card { break-inside: avoid; border: 1px solid #ccc; }
+            .card { break-inside: avoid; }
+            h1 { font-size: 28px; }
+            .sub { font-size: 15px; }
+            .legend { font-size: 12px; }
+            .stats { font-size: 14px; }
+            .interpretation { font-size: 13px; }
+            .interpretation .col-desc { font-size: 12px; }
+            .warning { font-size: 12px; }
+            .copyright { font-size: 4px; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 12px 8px 20px; }
+            h1 { font-size: 28px; }
+            input { font-size: 18px; padding: 12px 14px; }
+            button { font-size: 20px; padding: 14px 16px; }
+            .stats { font-size: 15px; gap: 6px; }
+            .result-card h3 { font-size: 20px; }
+            .result-card p { font-size: 16px; }
+            .legend { font-size: 12px; gap: 12px; }
+            .interpretation { font-size: 13px; }
+            .interpretation .col-desc { font-size: 12px; }
+            .warning { font-size: 12px; padding: 4px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>📈 График вступления в отношения</h1>
+<p class="sub">Введите даты мужчины и женщины – наложение графиков</p>
+
+<div class="card no-print">
+    <label>👨 Мужчина</label>
+    <input type="date" id="manDate" value="1983-07-25">
+    <label>👩 Женщина</label>
+    <input type="date" id="womanDate" value="1985-03-08">
+    <button id="calcBtn">🔮 ПОСТРОИТЬ ГРАФИК</button>
+    <button id="pdfBtn" class="btn-pdf" style="margin-top:8px;">📄 ВЫВЕСТИ В PDF</button>
+</div>
+
+<div id="result" class="result"></div>
+
+<div class="copyright no-print">
+    <p>© Все материалы являются интеллектуальной собственностью курса «Кармическая таронумерология».</p>
+    <p>Копирование, распространение и коммерческое использование без письменного разрешения запрещены.</p>
+    <p>По вопросам использования материалов обращайтесь: <a href="mailto:magnitinka@yandex.ru">magnitinka@yandex.ru</a></p>
+</div>
+
+<script>
+    function pad2(n) { return String(n).padStart(2, '0'); }
+
+    function calcGraph(birthDate) {
+        if (!birthDate) return null;
+        const parts = birthDate.split('-');
+        if (parts.length !== 3) return null;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10);
+        const day = parseInt(parts[2], 10);
+        if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+
+        const dm = parseInt(pad2(day) + pad2(month), 10);
+        const product = dm * year;
+        let productStr = String(product);
+        while (productStr.length < 7) productStr = '0' + productStr;
+        if (productStr.length > 7) productStr = productStr.slice(0, 7);
+
+        const digits = productStr.split('').map(Number);
+        const sum = digits.reduce((a, b) => a + b, 0);
+        const avg = sum / 7;
+
+        const topAges = [18, 19, 20, 21, 22, 23, 24];
+        const bottomAges = [25, 26, 27, 28, 29, 30, 31];
+
+        return { digits, avg, productStr, dm, year, sum, topAges, bottomAges };
+    }
+
+    function drawChart(manData, womanData, container) {
+        if (!manData || !womanData) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chart-container';
+        const canvas = document.createElement('canvas');
+        wrapper.appendChild(canvas);
+        container.appendChild(wrapper);
+
+        const width = Math.min(480, window.innerWidth - 40);
+        const height = Math.max(340, width * 0.6);
+        canvas.width = width * 2;
+        canvas.height = height * 2;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        const ctx = canvas.getContext('2d');
+        ctx.scale(2, 2);
+
+        const numPoints = manData.digits.length;
+        const pad = { top: 30, bottom: 55, left: 40, right: 40 };
+        const chartW = width - pad.left - pad.right;
+        const chartH = height - pad.top - pad.bottom;
+        const maxVal = 9;
+
+        function xPos(index) {
+            return pad.left + (index / (numPoints - 1)) * chartW;
+        }
+        function yPos(val) {
+            return pad.top + chartH - (val / maxVal) * chartH;
+        }
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Сетка Y
+        ctx.strokeStyle = '#e0d6c6';
+        ctx.lineWidth = 0.5;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#888';
+        ctx.font = '11px sans-serif';
+        for (let v = 0; v <= 9; v++) {
+            const y = yPos(v);
+            ctx.beginPath();
+            ctx.moveTo(pad.left, y);
+            ctx.lineTo(width - pad.right, y);
+            ctx.stroke();
+            ctx.fillStyle = '#888';
+            ctx.fillText(v.toString(), pad.left - 8, y);
+        }
+        ctx.save();
+        ctx.translate(14, height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#555';
+        ctx.font = '11px sans-serif';
+        ctx.fillText('Значение', 0, 0);
+        ctx.restore();
+
+        // Ось X
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#888';
+        ctx.font = '9px sans-serif';
+        for (let i = 0; i < numPoints; i++) {
+            const x = xPos(i);
+            if (i % 2 === 0) {
+                ctx.beginPath();
+                ctx.moveTo(x, pad.top);
+                ctx.lineTo(x, height - pad.bottom);
+                ctx.strokeStyle = '#e0d6c6';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+            }
+            ctx.fillStyle = '#888';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(manData.topAges[i].toString(), x, height - pad.bottom + 2);
+            ctx.textBaseline = 'top';
+            ctx.fillText(manData.bottomAges[i].toString(), x, height - pad.bottom + 12);
+        }
+        ctx.fillStyle = '#555';
+        ctx.font = '11px sans-serif';
+        ctx.textBaseline = 'top';
+        ctx.textAlign = 'center';
+        ctx.fillText('Столбцы (возраст)', width / 2, height - 4);
+
+        // Рисуем две линии
+        const datasets = [
+            { data: manData, color: '#2c3e50', label: 'Мужчина', dash: [] },
+            { data: womanData, color: '#e74c3c', label: 'Женщина', dash: [5, 3] }
+        ];
+
+        datasets.forEach(ds => {
+            const d = ds.data.digits;
+            const avg = ds.data.avg;
+            const avgY = yPos(avg);
+
+            // Заливка только для мужчины (полупрозрачная)
+            if (ds.label === 'Мужчина') {
+                ctx.beginPath();
+                for (let i = 0; i < numPoints; i++) {
+                    const x = xPos(i);
+                    const y = yPos(d[i]);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                for (let i = numPoints - 1; i >= 0; i--) {
+                    const x = xPos(i);
+                    const y = d[i] > avg ? yPos(avg) : yPos(d[i]);
+                    if (i === numPoints - 1) ctx.lineTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(46, 125, 50, 0.08)';
+                ctx.fill();
+
+                ctx.beginPath();
+                for (let i = 0; i < numPoints; i++) {
+                    const x = xPos(i);
+                    const y = yPos(d[i]);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                for (let i = numPoints - 1; i >= 0; i--) {
+                    const x = xPos(i);
+                    const y = d[i] < avg ? yPos(avg) : yPos(d[i]);
+                    if (i === numPoints - 1) ctx.lineTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(192, 57, 43, 0.08)';
+                ctx.fill();
+            }
+
+            // Линия
+            ctx.beginPath();
+            for (let i = 0; i < numPoints; i++) {
+                const x = xPos(i);
+                const y = yPos(d[i]);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = ds.color;
+            ctx.lineWidth = ds.label === 'Мужчина' ? 2.5 : 2;
+            ctx.setLineDash(ds.dash);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Точки
+            for (let i = 0; i < numPoints; i++) {
+                const x = xPos(i);
+                const y = yPos(d[i]);
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = ds.color;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                if (d[i] === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(x - 5, y - 5);
+                    ctx.lineTo(x + 5, y + 5);
+                    ctx.moveTo(x + 5, y - 5);
+                    ctx.lineTo(x - 5, y + 5);
+                    ctx.strokeStyle = '#c0392b';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+        });
+
+        // Средняя линия (по мужчине)
+        const avgMan = manData.avg;
+        const avgY = yPos(avgMan);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, avgY);
+        ctx.lineTo(width - pad.right, avgY);
+        ctx.strokeStyle = '#e67e22';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e67e22';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('средняя ' + avgMan.toFixed(2), width - pad.right - 4, avgY - 2);
+
+        // Легенда
+        const legendDiv = document.createElement('div');
+        legendDiv.className = 'legend';
+        legendDiv.innerHTML = `
+            <div class="legend-item"><span class="legend-color man"></span> Мужчина</div>
+            <div class="legend-item"><span class="legend-color woman"></span> Женщина (пунктир)</div>
+            <div style="font-size:12px; color:#888;">○ ноль – ⚠️ опасный период</div>
+        `;
+        wrapper.insertBefore(legendDiv, canvas);
+
+        // Статистика
+        const statsDiv = document.createElement('div');
+        statsDiv.className = 'stats';
+        statsDiv.innerHTML = `
+            <span>👨 ${manData.productStr} | средняя ${manData.avg.toFixed(2)}</span>
+            <span>👩 ${womanData.productStr} | средняя ${womanData.avg.toFixed(2)}</span>
+        `;
+        wrapper.appendChild(statsDiv);
+    }
+
+    function render() {
+        const manDate = document.getElementById('manDate').value;
+        const womanDate = document.getElementById('womanDate').value;
+        const resultDiv = document.getElementById('result');
+
+        if (!manDate || !womanDate) {
+            resultDiv.innerHTML = '<div class="result-card"><p style="color:#c0392b;">⚠️ Выберите даты обоих партнёров.</p></div>';
+            return;
+        }
+        const manData = calcGraph(manDate);
+        const womanData = calcGraph(womanDate);
+        if (!manData || !womanData) {
+            resultDiv.innerHTML = '<div class="result-card"><p style="color:#c0392b;">⚠️ Ошибка в датах.</p></div>';
+            return;
+        }
+
+        resultDiv.innerHTML = '';
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        card.innerHTML = `<h3>📈 Наложение графиков</h3>`;
+        resultDiv.appendChild(card);
+        drawChart(manData, womanData, card);
+
+        // Интерпретация
+        const interpCard = document.createElement('div');
+        interpCard.className = 'result-card';
+        interpCard.innerHTML = `<h3>🔮 Интерпретация</h3>`;
+
+        function buildInterp(data, label, cssClass) {
+            const hasZero = data.digits.includes(0);
+            let html = `<p><span class="${cssClass}">${label}</span> (средняя ${data.avg.toFixed(2)})</p>`;
+            if (hasZero) {
+                html += `<div class="warning">⚠️ Присутствует <span class="zero">0</span> – угроза разрыва!</div>`;
+            }
+            html += `<div class="col-desc"><ul>`;
+            for (let i = 0; i < data.digits.length; i++) {
+                const ages = [];
+                for (let age = 18 + i; age <= 66; age += 7) {
+                    ages.push(age);
+                }
+                const status = data.digits[i] > data.avg ? '✅' : data.digits[i] < data.avg ? '⚠️' : '➖';
+                let digitDisplay = `${data.digits[i]}`;
+                if (data.digits[i] === 0) digitDisplay = `<span class="zero">0 (угроза!)</span>`;
+                html += `<li><strong>Столбец ${i+1} (цифра ${digitDisplay})</strong> — ${status} возраста: ${ages.join(', ')}</li>`;
+            }
+            html += '</ul></div>';
+            return html;
+        }
+
+        interpCard.innerHTML += buildInterp(manData, 'Мужчина', 'man-label');
+        interpCard.innerHTML += '<hr>';
+        interpCard.innerHTML += buildInterp(womanData, 'Женщина', 'woman-label');
+        resultDiv.appendChild(interpCard);
+    }
+
+    document.getElementById('calcBtn').addEventListener('click', render);
+    document.getElementById('pdfBtn').addEventListener('click', () => window.print());
+    window.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
